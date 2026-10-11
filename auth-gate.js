@@ -76,7 +76,7 @@
   }
  }
  async function verify(){
-  try{const status=await request('/api/key/status');if(status.configured)unlock();else setView('key');}
+  try{await request('/api/key/status');unlock();}
   catch(e){token='';sessionStorage.removeItem(storage);setView('login',e.message);}
  }
  document.addEventListener('DOMContentLoaded',()=>{

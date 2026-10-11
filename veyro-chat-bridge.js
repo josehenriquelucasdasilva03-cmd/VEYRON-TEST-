@@ -3,6 +3,7 @@
   const cfg=window.VEYRO_RUNTIME||{};
   const localFetch=window.fetch.bind(window); // backend local do chrome-demo.js
   const API=String(cfg.apiBase||'').replace(/\/$/,'');
+  const LIVE=cfg.useLiveChat===true;
   const DB_KEY='veyro_chrome_test_v010';
   const ACCESS_KEY=cfg.accessCodeStorageKey||'veyro_test_access_code_v020';
   const active=new Map();
@@ -26,7 +27,7 @@
   async function accessCode(){return window.VEYRO_AUTH?.token||'';}
   async function callBackend(payload,controller,retry=true){
     const code=await accessCode(false);if(!code)throw Object.assign(Error('Código de acesso necessário.'),{status:401});
-    const r=await localFetch(API+'/api/chat',{method:'POST',headers:{'Content-Type':'application/json',Authorization:'Bearer '+code},body:JSON.stringify(payload),signal:controller.signal,mode:'cors'});
+    const r=await localFetch(API+(LIVE?'/api/chat':'/api/chat/demo'),{method:'POST',headers:{'Content-Type':'application/json',Authorization:'Bearer '+code},body:JSON.stringify(payload),signal:controller.signal,mode:'cors'});
     if(r.status===401){window.VEYRO_AUTH?.logout();throw Object.assign(Error('Sessão encerrada. Entre novamente.'),{status:401});}
     if(!r.ok){let msg='A Veyro não conseguiu responder agora.';try{const d=await r.json();if(d?.error)msg=d.error;}catch{}throw Object.assign(Error(msg),{status:r.status});}
     return r;
@@ -54,7 +55,9 @@
     },cancel(){control.abort();active.delete(requestId);}}),{headers:{'Content-Type':'text/event-stream; charset=utf-8','Cache-Control':'no-cache'}});
   }
   async function remoteStatus(path,init){
-    try{const code=window.VEYRO_AUTH?.token||'';const r=await localFetch(API+'/api/health',{headers:code?{Authorization:'Bearer '+code}:{},mode:'cors'});const h=await r.json();if(!r.ok)throw Error();if(path==='/api/health/model')return Response.json({configured:h.modelConfigured,reachable:h.modelConfigured,provider:'openai',model:h.model||null,simulated:false},{status:h.modelConfigured?200:503});const base=await localFetch(path,init),data=await base.json();return Response.json({...data,chat:h.modelConfigured,chatProvider:h.modelConfigured?'openai-test':'chrome-demo',developmentVersion:'0.2.0'});}catch{return localFetch(path,init);}
+    try{const code=window.VEYRO_AUTH?.token||'';const r=await localFetch(API+'/api/health',{headers:code?{Authorization:'Bearer '+code}:{},mode:'cors'});const h=await r.json();if(!r.ok)throw Error();if(path==='/api/health/model')return Response.json(LIVE?
+     {configured:h.modelConfigured&&h.liveEnabled,reachable:h.modelConfigured&&h.liveEnabled,provider:'openai',model:h.model||null,simulated:false}:
+     {configured:true,reachable:true,provider:'demo',model:'resposta demonstrativa',simulated:true},{status:LIVE&&(!h.modelConfigured||!h.liveEnabled)?503:200});const base=await localFetch(path,init),data=await base.json();return Response.json({...data,chat:LIVE&&h.liveEnabled&&h.modelConfigured,chatProvider:LIVE&&h.liveEnabled&&h.modelConfigured?'openai-test':'demo-sem-ia',developmentVersion:'0.2.0'});}catch{return localFetch(path,init);}
   }
   window.fetch=(input,init={})=>{
     const value=typeof input==='string'?input:input?.url||'';
@@ -65,5 +68,5 @@
     if(method==='GET'&&(url.pathname==='/api/status'||url.pathname==='/api/health/model'))return remoteStatus(url.pathname,init);
     return localFetch(input,init);
   };
-  if(API){banner('MODO TESTE · BACKEND REAL CONFIGURADO',true);}
+  if(API){banner(LIVE?'MODO TESTE · API REAL':'MODO DEMONSTRAÇÃO · SEM IA · SEM CUSTO DE API',true);}
 })();

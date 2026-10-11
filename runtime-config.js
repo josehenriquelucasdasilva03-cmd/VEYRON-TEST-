@@ -3,5 +3,6 @@
 window.VEYRO_RUNTIME={
  mode:'secure-test',
  authEnabled:true,
+ useLiveChat:false,
  apiBase:'https://veyro-auth-test.josehenriquelucasdasilva03.workers.dev'
 };
