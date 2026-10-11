@@ -8,9 +8,16 @@ const sha = async s => new Uint8Array(await crypto.subtle.digest('SHA-256',enc.e
 const answer = (x,status=200) => new Response(JSON.stringify(x),{status,headers:{'Content-Type':'application/json; charset=utf-8','Cache-Control':'no-store'}});
 const error = (message,status=400) => answer({error:message},status);
 const same = (a,b) => a.length===b.length && a.reduce((v,x,i)=>v|(x^b[i]),0)===0;
-async function passwordHash(password,salt) {
- const k=await crypto.subtle.importKey('raw',enc.encode(password),'PBKDF2',false,['deriveBits']);
- return new Uint8Array(await crypto.subtle.deriveBits({name:'PBKDF2',hash:'SHA-256',salt,iterations:210000},k,256));
+// Cloudflare accepts at most 100000 PBKDF2 rounds per invocation.
+// Protect the salted hash with a server-only HMAC pepper derived from VEYRO_MASTER_KEY.
+async function passwordHash(password,salt,env) {
+ if(!env.VEYRO_MASTER_KEY)throw Error('MASTER_KEY_MISSING');
+ const pepper=from64(env.VEYRO_MASTER_KEY);
+ if(pepper.length!==32)throw Error('MASTER_KEY_LENGTH');
+ const hmac=await crypto.subtle.importKey('raw',pepper,{name:'HMAC',hash:'SHA-256'},false,['sign']);
+ const keyed=await crypto.subtle.sign('HMAC',hmac,enc.encode(password));
+ const k=await crypto.subtle.importKey('raw',keyed,'PBKDF2',false,['deriveBits']);
+ return new Uint8Array(await crypto.subtle.deriveBits({name:'PBKDF2',hash:'SHA-256',salt,iterations:100000},k,256));
 }
 async function readBody(request){
  if(Number(request.headers.get('content-length')||0)>24000)throw Error('BODY_LIMIT');
@@ -58,7 +65,7 @@ async function route(request,env) {
   if(code!==env.VEYRO_SETUP_CODE)return error('Código privado de instalação inválido.',403);
   const count=await env.DB.prepare('SELECT COUNT(*) AS n FROM users').first();
   if(count.n!==0)return error('O cadastro inicial já foi realizado.',403);
-  const id=crypto.randomUUID(),salt=rnd(16),hash=await passwordHash(password,salt);
+  const id=crypto.randomUUID(),salt=rnd(16),hash=await passwordHash(password,salt,env);
   try {await env.DB.prepare('INSERT INTO users(id,username,salt,pass_hash,failures,locked_until) VALUES(?,?,?,?,0,0)').bind(id,username,to64(salt),to64(hash)).run();}
   catch{return error('Não foi possível registrar a conta.',409);}
   return createSession(env,{id,username});
@@ -69,7 +76,7 @@ async function route(request,env) {
   const row=await env.DB.prepare('SELECT * FROM users WHERE username=?').bind(username).first();
   if(!row)return error('Usuário ou senha incorretos.',401);
   if(row.locked_until>now())return error('Aguarde 15 minutos para tentar novamente.',429);
-  const match=same(await passwordHash(password,from64(row.salt)),from64(row.pass_hash));
+  const match=same(await passwordHash(password,from64(row.salt),env),from64(row.pass_hash));
   if(!match){
    const attempts=row.failures+1;
    await env.DB.prepare('UPDATE users SET failures=?,locked_until=? WHERE id=?').bind(attempts>=5?0:attempts,attempts>=5?now()+900:0,row.id).run();
@@ -158,7 +165,10 @@ export default {async fetch(request,env){
   'Access-Control-Allow-Origin':responseOrigin,'Access-Control-Allow-Methods':'GET,POST,DELETE,OPTIONS',
   'Access-Control-Allow-Headers':'Authorization,Content-Type','Access-Control-Max-Age':'600','Vary':'Origin'
  }});
- let response;try{response=await route(request,env);}catch{response=error('Erro interno de configuração ou processamento.',500);}
+ let response;try{response=await route(request,env);}catch(e){
+  console.error('VEYRO_AUTH_RUNTIME_FAILURE', {name:e?.name||'Error',path:new URL(request.url).pathname});
+  response=error('Erro interno de configuração ou processamento.',500);
+ }
  const h=new Headers(response.headers);
  h.set('Access-Control-Allow-Origin',responseOrigin);h.set('Vary','Origin');
  h.set('X-Frame-Options','DENY');h.set('Referrer-Policy','no-referrer');
