@@ -23,11 +23,11 @@
   function projectFor(db,c){const p=(db?.projects||[]).find(p=>p.id===c.project_id);if(!p)return null;return {title:p.title,state:p.state};}
   function updateAssistant(db,c,requestId,patch){const a=c.messages.find(m=>m.id===requestId);if(!a)return;Object.assign(a,patch,{updated_at:Date.now()});c.updated_at=Date.now();saveDb(db);}
   function sseError(message,requestId){return new Response(new ReadableStream({start(controller){controller.enqueue(enc.encode(`event: error\ndata: ${JSON.stringify({message,messageId:requestId})}\n\n`));controller.close();}}),{status:200,headers:{'Content-Type':'text/event-stream; charset=utf-8','Cache-Control':'no-cache'}});}
-  async function accessCode(force=false){let code=force?'':localStorage.getItem(ACCESS_KEY)||'';if(!code){code=prompt('Digite o código privado do teste da Veyro:')||'';if(code)localStorage.setItem(ACCESS_KEY,code);}return code;}
+  async function accessCode(){return window.VEYRO_AUTH?.token||'';}
   async function callBackend(payload,controller,retry=true){
     const code=await accessCode(false);if(!code)throw Object.assign(Error('Código de acesso necessário.'),{status:401});
-    const r=await localFetch(API+'/api/chat',{method:'POST',headers:{'Content-Type':'application/json','X-Veyro-Test-Key':code},body:JSON.stringify(payload),signal:controller.signal,mode:'cors'});
-    if(r.status===401&&retry){localStorage.removeItem(ACCESS_KEY);const fresh=await accessCode(true);if(!fresh)throw Object.assign(Error('Código de acesso necessário.'),{status:401});return callBackend(payload,controller,false);}
+    const r=await localFetch(API+'/api/chat',{method:'POST',headers:{'Content-Type':'application/json',Authorization:'Bearer '+code},body:JSON.stringify(payload),signal:controller.signal,mode:'cors'});
+    if(r.status===401){window.VEYRO_AUTH?.logout();throw Object.assign(Error('Sessão encerrada. Entre novamente.'),{status:401});}
     if(!r.ok){let msg='A Veyro não conseguiu responder agora.';try{const d=await r.json();if(d?.error)msg=d.error;}catch{}throw Object.assign(Error(msg),{status:r.status});}
     return r;
   }
@@ -54,7 +54,7 @@
     },cancel(){control.abort();active.delete(requestId);}}),{headers:{'Content-Type':'text/event-stream; charset=utf-8','Cache-Control':'no-cache'}});
   }
   async function remoteStatus(path,init){
-    try{const code=localStorage.getItem(ACCESS_KEY)||'';const r=await localFetch(API+'/api/health',{headers:code?{'X-Veyro-Test-Key':code}:{},mode:'cors'});const h=await r.json();if(!r.ok)throw Error();if(path==='/api/health/model')return Response.json({configured:h.modelConfigured,reachable:h.modelConfigured,provider:'openai',model:h.model||null,simulated:false},{status:h.modelConfigured?200:503});const base=await localFetch(path,init),data=await base.json();return Response.json({...data,chat:h.modelConfigured,chatProvider:h.modelConfigured?'openai-test':'chrome-demo',developmentVersion:'0.2.0'});}catch{return localFetch(path,init);}
+    try{const code=window.VEYRO_AUTH?.token||'';const r=await localFetch(API+'/api/health',{headers:code?{Authorization:'Bearer '+code}:{},mode:'cors'});const h=await r.json();if(!r.ok)throw Error();if(path==='/api/health/model')return Response.json({configured:h.modelConfigured,reachable:h.modelConfigured,provider:'openai',model:h.model||null,simulated:false},{status:h.modelConfigured?200:503});const base=await localFetch(path,init),data=await base.json();return Response.json({...data,chat:h.modelConfigured,chatProvider:h.modelConfigured?'openai-test':'chrome-demo',developmentVersion:'0.2.0'});}catch{return localFetch(path,init);}
   }
   window.fetch=(input,init={})=>{
     const value=typeof input==='string'?input:input?.url||'';

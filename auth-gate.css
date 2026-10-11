@@ -1,0 +1,17 @@
+html.veyro-auth-pending body > :not(#veyro-auth-screen){visibility:hidden!important}
+#veyro-auth-screen[hidden]{display:none!important}
+#veyro-auth-screen{position:fixed;inset:0;z-index:2147483647;display:flex;align-items:center;justify-content:center;overflow:auto;background:radial-gradient(ellipse at 50% 0%,#423311 0%,#0a0a0a 55%,#030303 100%);padding:20px;color:#faf8f3;font:16px system-ui,sans-serif}
+.veyro-auth-card{box-sizing:border-box;width:min(100%,440px);padding:clamp(25px,5vw,40px);background:#10100f;border:1px solid #76602a;border-radius:22px;box-shadow:0 32px 90px #000b}
+.veyro-auth-brand{text-align:center;font-size:30px;font-weight:900;letter-spacing:.1em}.veyro-auth-brand strong{color:#ecca64}
+.veyro-auth-eyebrow{display:block;text-align:center;color:#bfa25b;font-size:11px;letter-spacing:.2em;font-weight:700;margin:18px 0 10px}
+.veyro-auth-card h1{text-align:center;font-size:25px;line-height:1.2;margin:0 0 13px;color:#fff}
+.veyro-auth-description{color:#bebbb4;font-size:13px;line-height:1.5;text-align:center;margin:0 0 24px}
+.veyro-auth-card label{display:block;color:#eee7d9;font-size:13px;font-weight:700;margin:0 0 17px}
+.veyro-auth-card input{display:block;box-sizing:border-box;width:100%;margin-top:7px;min-width:0;border:1px solid #554b32;border-radius:10px;background:#211f1a;color:#fff;font:15px system-ui;padding:12px 14px}
+.veyro-auth-card input:focus{outline:2px solid #dbb64f;outline-offset:2px}
+.veyro-auth-main{width:100%;padding:14px 18px;border:0;border-radius:11px;background:#e8c15a;color:#16120b;font-size:14px;font-weight:900;cursor:pointer}
+.veyro-auth-main:disabled{opacity:.6}
+#veyro-auth-status{font-size:12px;color:#f2c08c;min-height:24px;line-height:1.5;overflow-wrap:anywhere}
+.veyro-auth-action{text-align:center}.veyro-auth-action button{border:0;background:transparent;color:#e9c961;padding:8px 12px;font-weight:700;cursor:pointer}
+.veyro-auth-footnote{border-top:1px solid #333029;padding-top:16px;margin:16px 0 0;color:#aaa59a;font-size:11px;text-align:center}
+#veyro-logout{margin-left:auto;padding:6px 12px;border:1px solid #77622b;border-radius:8px;background:#17130d;color:#edca68;cursor:pointer}
