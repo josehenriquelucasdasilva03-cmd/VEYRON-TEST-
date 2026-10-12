@@ -70,14 +70,41 @@
 .feature button{background:#d6b575;color:#1a1714;border:0;padding:12px 20px;border-radius:11px;margin-top:15px}
 body.featureMode .hero,body.featureMode .chatScroll,body.featureMode .composerWrap{display:none!important}body.featureMode .feature{display:flex}
 .cover{position:fixed;inset:0;background:#000a;z-index:14;display:none}
-.loginLayer{position:fixed;inset:0;z-index:40;background:radial-gradient(circle at 48% 25%,#2d30402b,#05070bee 55%),#06090a;display:grid;place-items:center;padding:20px}
-.loginCard{width:min(420px,100%);background:#121721;border:1px solid #b79f6b66;border-radius:21px;padding:27px;box-shadow:0 20px 90px #000c}
-.loginCard h2{font-size:30px;font-weight:500;margin:9px 0}.loginCard h2 b{color:#e1bd79}
-.loginCard p{color:#9da4ae;font-size:13px;line-height:1.6}
-.loginCard label{display:block;font-size:12px;color:#d4d6de;margin:17px 0}
-.loginCard input{display:block;margin-top:7px;width:100%;border:1px solid #657086;background:#080c14;color:white;border-radius:10px;padding:13px}
-.loginCard button{width:100%;border:0;border-radius:11px;background:#deb974;color:#1b1a17;font-weight:700;padding:14px}
-.loginerror{font-size:12px;color:#ffc1a7;white-space:pre-wrap;min-height:20px}
+.loginLayer{position:fixed;inset:0;z-index:40;display:grid;place-items:center;padding:20px;background:radial-gradient(circle at 52% 24%,#26334983 0%,#080c15f5 44%,#040609 80%);overflow:auto;isolation:isolate}
+.loginBackdrop{position:absolute;inset:-5%;pointer-events:none;overflow:hidden;z-index:-1;background-image:radial-gradient(1px 1px at 12% 28%,#fff9 98%,transparent),radial-gradient(2px 2px at 76% 13%,#efc77aaf 98%,transparent),radial-gradient(1px 1px at 82% 66%,#bbccea 98%,transparent),radial-gradient(2px 2px at 34% 88%,#fff7 98%,transparent);background-size:410px 350px;animation:loginStars 32s ease-in-out infinite alternate}
+.loginBackdrop:before,.loginBackdrop:after{content:"";position:absolute;border-radius:50%;filter:blur(20px);pointer-events:none}
+.loginBackdrop:before{width:330px;height:330px;top:-170px;right:-100px;background:radial-gradient(circle at 30% 35%,#9ba5b4,#42577a 30%,#080d1b 66%,transparent 75%);opacity:.42;animation:loginFloat 9s ease-in-out infinite alternate}
+.loginBackdrop:after{width:280px;height:280px;bottom:-200px;left:-100px;background:radial-gradient(circle,#c6a55d4f,transparent 65%);animation:loginFloat 11s ease-in-out infinite alternate-reverse}
+.loginCard{position:relative;overflow:hidden;width:min(438px,100%);background:linear-gradient(160deg,#1a222ce8,#0c1018f0 70%);border:1px solid #b9a1706c;border-radius:27px;padding:clamp(21px,5vw,34px);box-shadow:0 30px 100px #000e,0 0 70px #cfa96218,inset 0 1px #ffffff16;backdrop-filter:blur(22px);animation:loginEnter .75s cubic-bezier(.2,.86,.2,1) both}
+.loginCard:before{content:"";position:absolute;inset:0 0 auto;height:2px;background:linear-gradient(90deg,transparent,#e8cd92,transparent);opacity:.7}
+.loginMark{position:relative;margin:0 auto 17px;width:86px;height:86px;display:grid;place-items:center}
+.loginMark .core{position:absolute;width:53px;height:53px;display:grid;place-items:center;border:1px solid #e6c889a8;border-radius:19px;transform:rotate(-17deg);background:radial-gradient(circle at 30% 25%,#65728f77,#17202b 70%);box-shadow:0 0 36px #c5a66034}
+.loginMark .core span{font-size:25px;color:#ffe1a1;transform:rotate(17deg);text-shadow:0 0 17px #f5c66d}
+.loginMark .orbitRing{position:absolute;inset:0;border:1px solid #e4be756c;border-radius:50%;transform:rotate(-24deg) rotateX(60deg);animation:loginRing 8s linear infinite}
+.loginMark .orbitRing.two{inset:-9px;border-color:#ffffff23;animation-duration:13s;animation-direction:reverse}
+.loginCard h2{font-size:clamp(27px,6vw,33px);font-weight:520;letter-spacing:4px;text-align:center;margin:10px 0 5px}.loginCard h2 b{color:#e6c17c}
+.loginCard p{color:#aab1c1;font-size:13px;line-height:1.65;text-align:center;margin:8px 0 24px}
+.loginCard .eyebrow{text-align:center;font-size:10px}
+.loginCard label{display:block;font-size:12px;color:#d6d8df;margin:15px 0 6px;font-weight:560}
+.loginCard input[type=text],.loginCard input[type=password]{display:block;margin-top:8px;width:100%;border:1px solid #586579;background:#080d16;color:#f8f8fa;border-radius:12px;padding:14px 13px;min-height:48px;transition:border-color .2s,box-shadow .2s}
+.loginCard input:focus{border-color:#d7b56d;box-shadow:0 0 0 3px #d7b56d22;outline:none}
+.loginCard input::placeholder{color:#858e9d}
+.loginCard .passwordField{position:relative}
+.loginCard .passwordField input{padding-right:54px}
+.loginCard .eyeButton{position:absolute;right:6px;bottom:6px;width:40px;height:38px;padding:0;display:grid;place-items:center;border:0;border-radius:9px;background:transparent;color:#c6cbd4;box-shadow:none}
+.loginCard .eyeButton svg{width:20px;height:20px}
+.loginCard .eyeButton:hover,.loginCard .eyeButton:focus-visible{background:#ffffff10;color:#f0d393}
+.loginCard .rememberRow{display:flex;gap:10px;align-items:center;margin:12px 0 18px;font-size:12px;font-weight:440;color:#adb3bf}
+.loginCard .rememberRow input{width:17px;height:17px;margin:0;accent-color:#d9b771}
+.loginCard .loginSubmit{width:100%;border:1px solid #ffe8ae48;border-radius:12px;background:linear-gradient(105deg,#caa15b,#f4d897 50%,#be9854);color:#1b1a17;font-weight:700;padding:15px;box-shadow:0 11px 29px #b78e3c23;transition:transform .2s,filter .2s}
+.loginCard .loginSubmit:hover{filter:brightness(1.07);transform:translateY(-1px)}
+.loginCard .loginSubmit:disabled{opacity:.55;cursor:wait}
+.loginerror{font-size:12px;color:#ffc1a7;white-space:pre-wrap;min-height:23px;text-align:center;line-height:1.6}
+.loginCard .passwordNote{margin:15px 0 0;color:#8d97a8;font-size:11px}
+@keyframes loginEnter{from{opacity:0;transform:translateY(35px) scale(.94);filter:blur(7px)}to{opacity:1;transform:translateY(0) scale(1);filter:blur(0)}}
+@keyframes loginRing{to{transform:rotate(336deg) rotateX(60deg)}}
+@keyframes loginFloat{to{transform:translate3d(-20px,22px,0)}}
+@keyframes loginStars{to{transform:translate3d(12px,18px,0)}}
 @keyframes drift{to{transform:translate3d(90px,50px,0)}}@keyframes orbit{to{transform:rotateX(5deg) rotateY(21deg) translateY(-14px)}}@keyframes launch{from{opacity:0;transform:perspective(520px) translate3d(-130px,80px,-240px) rotateY(-20deg) scale(.8);filter:blur(12px)}to{opacity:1;transform:perspective(520px) translate3d(0,0,0) rotateY(0) scale(1);filter:blur(0)}}
 @media(max-width:860px){.shell{grid-template-columns:1fr}.nav{position:fixed;top:0;bottom:0;width:min(310px,85vw);transform:translateX(-110%);transition:transform .25s}.nav.open{transform:translateX(0)}.cover.show{display:block}.mobmenu{display:grid}.topbar{height:65px;padding:0 17px}.topBrand{font-size:16px;letter-spacing:3px}.statuspill{max-width:43%;font-size:9px;padding:6px}.planetWrap{width:440px;height:440px;right:calc(50% - 250px);top:12%}.hero{min-height:250px}.hero h1{font-size:51px}.hero p{max-width:325px}.composerWrap{padding-bottom:max(12px,env(safe-area-inset-bottom))}.message{max-width:92%}}
 @media(max-height:660px){.hero{min-height:170px}.hero h1{font-size:40px}.hero p{font-size:12px}.chips{margin-top:4px}}
@@ -114,12 +141,28 @@ body.featureMode .hero,body.featureMode .chatScroll,body.featureMode .composerWr
 <p class="hint" id="hint">Demonstração sem IA · Qwen real desativado até confirmação de custos</p></div>
 </div>
 </section></div>
-<section class="loginLayer" id="loginLayer" aria-label="Entrar no Veyro IA"><form class="loginCard" id="loginForm" autocomplete="off"><div class="eyebrow">Acesso privado</div><h2>VEYRO <b>IA</b></h2><p>Entre com sua conta já criada. Esta tela funciona na mesma aba do chat.</p><label>Usuário<input name="username" required pattern="[A-Za-z0-9_.-]+" minlength="3" maxlength="32" autocomplete="username" autocapitalize="none"></label><label>Senha<input name="password" type="password" required minlength="12" maxlength="128" autocomplete="current-password"></label><div class="loginerror" id="loginerror" role="status"></div><button type="submit" id="loginBtn">Entrar e abrir Veyro IA</button></form></section>
+<section class="loginLayer" id="loginLayer" aria-label="Entrar no Veyro IA"><div class="loginBackdrop" aria-hidden="true"></div><form class="loginCard" id="loginForm" autocomplete="on" action="/api/auth/login" method="post"><div class="loginMark" aria-hidden="true"><span class="orbitRing"></span><span class="orbitRing two"></span><div class="core"><span>✦</span></div></div><div class="eyebrow">ACESSO PRIVADO · SEU UNIVERSO</div><h2>VEYRO <b>IA</b></h2><p id="loginSubtitle">Entre na sua conta para continuar de onde parou.</p><label for="loginUsername">Usuário<input id="loginUsername" name="username" type="text" required pattern="[A-Za-z0-9_.-]+" minlength="3" maxlength="32" autocomplete="username" autocapitalize="none" spellcheck="false" placeholder="Seu nome de usuário"></label><label for="loginPassword">Senha</label><div class="passwordField"><input id="loginPassword" name="password" type="password" required minlength="12" maxlength="128" autocomplete="current-password" placeholder="Digite sua senha"><button class="eyeButton" type="button" id="togglePassword" aria-label="Mostrar senha" aria-pressed="false" title="Mostrar senha"><svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3.6-6.5 10-6.5S22 12 22 12s-3.6 6.5-10 6.5S2 12 2 12Z"/><circle cx="12" cy="12" r="3"/></svg></button></div><label class="rememberRow" for="rememberUsername"><input id="rememberUsername" name="rememberUsername" type="checkbox" checked> Lembrar meu usuário neste dispositivo</label><div class="loginerror" id="loginerror" role="status" aria-live="polite"></div><button class="loginSubmit" type="submit" id="loginBtn">Entrar no Veyro IA →</button><p class="passwordNote">Para guardar sua senha com segurança, use a opção “Salvar senha” do Google Chrome. O Veyro IA guarda apenas seu usuário, se você permitir.</p></form></section>
 <script nonce="__NONCE__">
 (function(){
 'use strict';
 const $=id=>document.getElementById(id);
 const SESSION='veyro_owner_test_session';
+const REMEMBERED_USER='veyro_remembered_username_v1';
+function getRememberedUser(){try{const value=localStorage.getItem(REMEMBERED_USER)||'';return /^[a-z0-9_.-]{3,32}$/i.test(value)?value:'';}catch{return '';}}
+function saveRememberedUser(user,remember){try{if(remember)localStorage.setItem(REMEMBERED_USER,user);else localStorage.removeItem(REMEMBERED_USER);}catch{}}
+function prefillRememberedUser(){
+ const user=getRememberedUser();
+ $('loginUsername').value=user;
+ $('rememberUsername').checked=!!user||!localStorageAvailable();
+ $('loginSubtitle').textContent=user?'Boas-vindas de volta! Informe sua senha para entrar.':'Entre na sua conta para continuar de onde parou.';
+}
+function localStorageAvailable(){try{return typeof localStorage!=='undefined';}catch{return false;}}
+function concealPassword(){
+ $('loginPassword').type='password';
+ $('togglePassword').setAttribute('aria-label','Mostrar senha');
+ $('togglePassword').setAttribute('title','Mostrar senha');
+ $('togglePassword').setAttribute('aria-pressed','false');
+}
 let token=sessionStorage.getItem(SESSION)||'';
 let username='',threads=[],selected=null,pending=false,view='chat';
 const getKey=()=> 'veyro_preview_threads_'+username.replace(/[^a-z0-9_.-]/g,'');
@@ -136,10 +179,18 @@ async function api(path,method='GET',data){
  if(!res.ok)throw Error(body.error||'Erro '+res.status);
  return body;
 }
-function loginScreen(error=''){$('loginLayer').hidden=false;$('loginerror').textContent=error;notice('● ACESSO PRIVADO');}
+function loginScreen(error=''){
+ $('loginLayer').hidden=false;
+ $('loginerror').textContent=error;
+ $('loginPassword').value='';
+ concealPassword();
+ prefillRememberedUser();
+ notice('● ACESSO PRIVADO');
+}
 function ready(data){
  username=safeText(data.username);$('profileName').textContent=username;
  $('loginLayer').hidden=true;
+ $('loginPassword').value='';concealPassword();
  try{const stored=JSON.parse(sessionStorage.getItem(getKey())||'[]');threads=Array.isArray(stored)?stored.slice(0,16):[];}catch{threads=[];}
  openChat(threads[0]?.id||null);
  refreshModels();
@@ -149,11 +200,29 @@ async function verify(){
  try{const r=await api('/api/key/status');ready(r);}
  catch{token='';sessionStorage.removeItem(SESSION);loginScreen('Sua sessão expirou. Entre novamente.');}
 }
+$('togglePassword').addEventListener('click',()=>{
+ const field=$('loginPassword'),show=field.type==='password';
+ field.type=show?'text':'password';
+ $('togglePassword').setAttribute('aria-label',show?'Ocultar senha':'Mostrar senha');
+ $('togglePassword').setAttribute('title',show?'Ocultar senha':'Mostrar senha');
+ $('togglePassword').setAttribute('aria-pressed',String(show));
+ field.focus({preventScroll:true});
+});
 $('loginForm').addEventListener('submit',async e=>{
- e.preventDefault();const btn=$('loginBtn'),f=new FormData(e.currentTarget);btn.disabled=true;$('loginerror').textContent='Verificando sua conta...';
- try{const r=await api('/api/auth/login','POST',{username:safeText(f.get('username')),password:safeText(f.get('password'))});if(!r.token)throw Error('Sessão inválida.');
- token=r.token;sessionStorage.setItem(SESSION,token);$('loginForm').reset();await verify();}
- catch(err){$('loginerror').textContent=err.message||'Não foi possível entrar.';}
+ e.preventDefault();
+ const btn=$('loginBtn'),f=new FormData(e.currentTarget);
+ const typedUsername=safeText(f.get('username')).trim().toLowerCase();
+ const wantsRemember=$('rememberUsername').checked;
+ btn.disabled=true;
+ $('loginerror').textContent='Verificando sua conta...';
+ try{
+  const result=await api('/api/auth/login','POST',{username:typedUsername,password:safeText(f.get('password'))});
+  if(!result.token)throw Error('Sessão inválida.');
+  token=result.token;sessionStorage.setItem(SESSION,token);
+  saveRememberedUser(safeText(result.username||typedUsername),wantsRemember);
+  $('loginPassword').value='';concealPassword();
+  await verify();
+ }catch(err){$('loginerror').textContent=err.message||'Não foi possível entrar.';}
  finally{btn.disabled=false;}
 });
 $('logout').addEventListener('click',async()=>{
@@ -242,6 +311,7 @@ async function sendMessage(message){
 }
 $('compose').addEventListener('submit',e=>{e.preventDefault();const message=$('prompt').value.trim();if(!message||pending)return;$('prompt').value='';sendMessage(message);});
 $('prompt').addEventListener('keydown',e=>{if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();$('compose').requestSubmit();}});
+prefillRememberedUser();
 verify();
 })();
 </script>
