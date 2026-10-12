@@ -271,8 +271,13 @@ function appendMessage(m,scroll=true){
 }
 async function refreshModels(){
  try{const data=await api('/api/qwen/status');
-  if(data.enabled){$('model').options[1].disabled=false;$('model').options[1].textContent='Qwen3 30B · IA real';notice('● QWEN DISPONÍVEL');}
-  else{notice('● DEMONSTRAÇÃO SEGURA');}
+  if(data.enabled){
+   $('model').options[1].disabled=false;
+   $('model').options[1].textContent='Qwen3 30B · IA real';
+   $('model').value='qwen';
+   $('hint').textContent='Qwen3 real ativado · 20 mensagens/dia por conta · 100 mensagens/dia no teste · franquia Workers Free';
+   notice('● QWEN CONECTADO');
+  }else{notice('● DEMONSTRAÇÃO SEGURA');}
  }catch{notice('● DEMONSTRAÇÃO SEGURA');}
 }
 async function sendMessage(message){
