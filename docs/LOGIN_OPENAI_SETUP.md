@@ -23,3 +23,14 @@ ATENÇÃO: GitHub Pages é um host estático; a segurança real depende do Worke
 - Mesmo se habilitado futuramente, aplica limites básicos de 10 chamadas/minuto e 20 chamadas/dia por usuário, além de 500 tokens de saída. Isso **não** equivale a teto financeiro rígido. Exige aprovação de custos, limite de gastos no provedor e testes antes de habilitar.
 - O site em GitHub Pages permanece inalterado na branch principal. `runtime-config.js` na branch experimental usa `useLiveChat:false`.
 - O modo demonstrativo não representa uma resposta real do modelo. Testar a experiência completa requer ambiente de prévia para a branch experimental e validação de sessão, SSE, logout e limites.
+
+
+## API gratuita Qwen Workers AI (preparada, bloqueada por padrão)
+
+Modelo: `@cf/qwen/qwen3-30b-a3b-fp8` via vinculação de tipo `ai` denominada `AI` no Worker `veyro-auth-test`. A rota autenticada `POST /api/chat/qwen` responde em formato SSE compatível com a interface. `GET /api/qwen/status` informa limites sem dados sensíveis.
+
+**Importante:** `VEYRO_QWEN_ENABLED` fica ausente/desligada até verificar no painel Cloudflare que a conta está no plano Workers Free e não há faturamento por excedente. Não configure como `true` sem essa verificação e supervisão. O plano Workers Paid pode faturar acima dos 10.000 Neurons grátis; os limites do aplicativo não substituem controles da plataforma. Nenhuma chave OpenAI é necessária para o Workers AI.
+
+Limites preventivos: até 20 mensagens reais/dia por usuário, 100/dia compartilhadas, 3/minuto, 600 caracteres por pergunta, 4 mensagens curtas de histórico e 256 tokens de saída; contagem diária por UTC, com reserva atômica em D1. Esses limites são **por mensagens**, não garantem uma quantidade exata de Neurons ou custo zero se outros serviços compartilharem a conta. A franquia gratuita do Workers AI é de 10.000 Neurons/dia e reseta a 00:00 UTC.
+
+Migration incremental: criar `ai_daily_limits` conforme `worker/schema.sql` sem apagar as demais tabelas. O endpoint demonstrativo continua funcionando sem Workers AI. O site oficial segue sem alterações e a branch permanece em PR de rascunho.
