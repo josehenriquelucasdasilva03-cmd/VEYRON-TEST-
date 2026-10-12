@@ -1,8 +1,9 @@
 'use strict';
-// Veyro Test v0.2 — backend real conectado.
-// NÃO coloque chaves de API neste arquivo público.
+// Backend HTTPS do ambiente de testes. Nao publique credenciais neste arquivo.
 window.VEYRO_RUNTIME={
-  mode:'real',
-  apiBase:'https://veyro-backend-vercel-v020-2.vercel.app',
-  accessCodeStorageKey:'veyro_test_access_code_v020'
+ mode:'secure-test',
+ authEnabled:true,
+ useLiveChat:false,
+ useQwenChat:false,
+ apiBase:'https://veyro-auth-test.josehenriquelucasdasilva03.workers.dev'
 };
