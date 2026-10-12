@@ -214,7 +214,7 @@ async function sendMessage(message){
  if(!t){t={id:newID(),title:message.slice(0,48),messages:[]};threads.unshift(t);selected=t.id;}
  t.messages.push({role:'user',text:message,mode:chosenMode});
  if(t.messages.length>45)t.messages=t.messages.slice(-45);
- $('stage').classList.add('conversing');$('chatScroll').style.display='flex';
+ $('stage').classList.add('conversing');
  appendMessage({role:'user',text:message});
  const reply={role:'assistant',text:'',mode:chosenMode};t.messages.push(reply);const target=appendMessage(reply);persist();renderRecents();
  notice('● RESPONDENDO...');
